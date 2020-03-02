@@ -1,18 +1,16 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, ManyToMany, JoinTable, Index } from "typeorm";
-import { type } from "os";
-import { Order } from "../order/order.entity";
-import { Product } from "../product/product.entity";
+import { User } from "../user/user.entity";
+import { Product } from "src/product-data/models/product/product.entity";
 
 @Entity()
-export class OrderDetail {
-    
+export class ScanHistory {
     @PrimaryColumn()
-    orderId : number
+    email : string
 
     @Index()
-    @ManyToOne(type => Order,{onUpdate:"CASCADE"})
-    @JoinColumn({name : "orderId",referencedColumnName:"orderId"}) 
-    order : Order
+    @ManyToOne(type => User,{onUpdate:"CASCADE"})
+    @JoinColumn({name : "email",referencedColumnName:"email"}) 
+    user : User
 
     @PrimaryColumn({length:10})
     productId : string
@@ -22,7 +20,6 @@ export class OrderDetail {
     @JoinColumn({name : "productId",referencedColumnName:"productId"})
     product : Product
     
-    @Column()
-    quantity : number
-    
+    @Column({type:'datetime'})
+    scanDateTime : Date
 }

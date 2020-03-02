@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "../user/user.entity";
+import { User } from "src/user-data/models/user/user.entity";
 
 @Entity()
 export class Order {

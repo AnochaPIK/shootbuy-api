@@ -19,7 +19,7 @@ export class Furniture {
     @Column({default:0})
     furniturePrice: number
 
-    @Column({ length: 30 })ำ
+    @Column({ length: 30 })
     furnitureSize: string
 
     @Column({ type: "text", default: null })

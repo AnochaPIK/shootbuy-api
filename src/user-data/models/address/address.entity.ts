@@ -24,6 +24,5 @@ export class Address {
     @ManyToOne(type => User,{onUpdate:"CASCADE"})
     @JoinColumn({ name: "email"})
     user: User 
-    
-    
+       
 }
