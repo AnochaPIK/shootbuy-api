@@ -7,6 +7,11 @@ import { Electronic } from './models/electronic/electronic.entity';
 import { FoodAndBev } from './models/food-and-bev/food-and-bev.entity';
 import { Furniture } from './models/furniture/furniture.entity';
 import { Product } from './models/product/product.entity';
+import { User } from './models/user/user.entity';
+import { Address } from './models/address/address.entity';
+import { OrderDetail } from './models/order-detail/order-detail.entity';
+import { Order } from './models/order/order.entity';
+import { ScanHistory } from './models/scan-history/scan-history.entity';
 
 @Injectable()
 export class ProductDataService { 
@@ -17,6 +22,11 @@ export class ProductDataService {
         @InjectRepository(FoodAndBev) private foodAndBevRepository : Repository<FoodAndBev>,
         @InjectRepository(Furniture) private furnitureRepository : Repository<Furniture>,
         @InjectRepository(Product) private productRepository : Repository<Product>,
+        @InjectRepository(User) private userRepository : Repository<User>,
+        @InjectRepository(Address) private addressRepository : Repository<Address>,
+        @InjectRepository(Order) private orderRepository : Repository<Order>,
+        @InjectRepository(OrderDetail) private orderDetailRepository : Repository<OrderDetail>,
+        @InjectRepository(ScanHistory) private scanHistoryRepository : Repository<ScanHistory>,
     ){}
 
     async selectProductType(label): Promise<Product[]> {
