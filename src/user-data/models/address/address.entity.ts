@@ -7,6 +7,9 @@ export class Address {
     addressId : number
 
     @Column()
+    email : string
+
+    @Column()
     addressNumber : string
     
     @Column()

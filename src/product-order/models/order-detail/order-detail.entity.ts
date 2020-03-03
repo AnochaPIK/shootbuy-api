@@ -22,7 +22,7 @@ export class OrderDetail {
     @JoinColumn({name : "productId",referencedColumnName:"productId"})
     product : Product
     
-    @Column()
+    @Column({default:1})
     quantity : number
     
 }

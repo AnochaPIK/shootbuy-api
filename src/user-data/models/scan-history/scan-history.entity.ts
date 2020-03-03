@@ -20,6 +20,6 @@ export class ScanHistory {
     @JoinColumn({name : "productId",referencedColumnName:"productId"})
     product : Product
     
-    @Column({type:'datetime'})
+    @Column({type:'timestamp'})
     scanDateTime : Date
 }

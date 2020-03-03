@@ -11,15 +11,6 @@ export class Product {
 
     @Column()
     categoryId:number
-
-    // @OneToOne(type=>FoodAndBev,{onUpdate:"CASCADE"})
-    // foodAndBev : FoodAndBev
-
-    // @OneToOne(type=>Furniture,{onUpdate:"CASCADE"})
-    // furniture : Furniture
-
-    // @OneToOne(type=>Electronic,{onUpdate:"CASCADE"})
-    // electronic : Electronic
     
     @ManyToOne(type => Category,{onUpdate:"CASCADE"})
     @JoinColumn({ name: "categoryId"})

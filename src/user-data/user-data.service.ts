@@ -12,4 +12,30 @@ export class UserDataService {
         @InjectRepository(ScanHistory) private scanHistoryRepository: Repository<ScanHistory>,
         @InjectRepository(User) private userRepository: Repository<User>,
     ) { }
+
+    async selectUserData(email): Promise<any[]> {
+        const query = await this.userRepository.find({
+            relations: ["address"],
+            where: {
+                email: email
+            }
+        })
+        return query
+    }
+
+    async insertUserAddress(address: Address) {
+        return await this.addressRepository.save(address)
+    }
+
+    async getUserDataScanHistory(email) : Promise<any[]>{
+        const selectData = this.scanHistoryRepository.find({
+            relations : ["product"],
+            where:{
+                email : email
+            }
+        })
+        return selectData
+    }
+
+    
 }
