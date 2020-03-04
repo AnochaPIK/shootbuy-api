@@ -4,6 +4,7 @@ import { Address } from './models/address/address.entity';
 import { ScanHistory } from './models/scan-history/scan-history.entity';
 import { User } from './models/user/user.entity';
 import { Repository } from 'typeorm';
+import { Product } from 'src/product-data/models/product/product.entity';
 
 @Injectable()
 export class UserDataService {
@@ -27,15 +28,21 @@ export class UserDataService {
         return await this.addressRepository.save(address)
     }
 
-    async getUserDataScanHistory(email) : Promise<any[]>{
-        const selectData = this.scanHistoryRepository.find({
-            relations : ["product"],
-            where:{
-                email : email
-            }
-        })
+    async getUserDataScanHistory(email) {
+        var selectData = await this.userRepository.createQueryBuilder("user")
+        .innerJoinAndSelect("user.scanHistory","scanHistory")
+        .innerJoinAndSelect("scanHistory.product","product")
+        .innerJoinAndSelect("product.category","category")
+        .where("user.email = :email",{email : email})
+        .getMany()
+        console.log(selectData)
         return selectData
     }
 
-    
+    async insertUserDataScanHistory(scanHistory: ScanHistory) {
+        scanHistory.scanDateTime = null
+        await this.scanHistoryRepository.save(scanHistory)
+    }
+
+
 }
