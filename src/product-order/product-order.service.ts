@@ -4,6 +4,8 @@ import { Order } from './models/order/order.entity';
 import { Repository, getRepository } from 'typeorm';
 import { OrderDetail } from './models/order-detail/order-detail.entity';
 import { FoodAndBev } from 'src/product-data/models/food-and-bev/food-and-bev.entity';
+import { Electronic } from 'src/product-data/models/electronic/electronic.entity';
+import { Furniture } from 'src/product-data/models/furniture/furniture.entity';
 
 @Injectable()
 export class ProductOrderService {
@@ -13,73 +15,32 @@ export class ProductOrderService {
     ) { }
 
     async insertProductOrder(order: Order) {
-        const selectOrder = await this.getProductOrder(order.email)
-        if (selectOrder.length > 0) {
+        const selectOrder1 = await this.getProductOrderByEmail(order.email)
+        if (selectOrder1.length > 0) {
             var orderDetail = new OrderDetail()
-            orderDetail = order.orderDetail[0]
-            orderDetail.orderId = selectOrder[0].orderId
+            orderDetail.productId = order.orderDetail[0].productId
+            orderDetail.orderId = selectOrder1[0].orderId
             const orderDetailIsExist = await this.orderDetailRepository.find(orderDetail)
             if (orderDetailIsExist.length > 0) {
                 orderDetailIsExist[0].quantity++
-
                 await this.orderDetailRepository.save(orderDetailIsExist)
             }
-            else{
+            else {
                 await this.orderDetailRepository.save(orderDetail)
             }
-            
-            console.log( selectOrder[0].orderDetail)
-
-
-            
-
-
-
-
-
-            // const selectProductOrderDetail = await this.orderDetailRepository.find({
-            //     relations: ["product"],
-            //     where: {
-            //         orderId: orderDetail.orderId,
-            //         productId: orderDetail.productId
-            //     }
-            // })
-            // const categoryId = selectProductOrderDetail[0].product.categoryId
-            // if (categoryId == 1) {
-            //     const foodAndBevData = await getRepository(FoodAndBev).find({
-            //         where: {
-            //             foodAndBevId: selectProductOrderDetail[0].product.productId
-            //         }
-            //     })
-            //     var totalFoodAndBevPrice = foodAndBevData[0].foodAndBevPrice * selectProductOrderDetail[0].quantity
-            //     const selectProductOrder = await this.orderRepository.find({
-            //         where: {
-            //             orderId: selectOrder[0].orderId,
-            //         }
-            //     })
-            //     var updateOrder = new Order()
-            //     updateOrder = selectProductOrder[0]
-            //     updateOrder.totalPrice += totalFoodAndBevPrice
-            //     await this.orderRepository.save(updateOrder)
-
-            // }
-            // else if (categoryId == 2) {
-
-            // }
-            // else if (categoryId == 3) {
-
-            // }
+            this.updateProductOrderPrice(selectOrder1[0].orderId)
         }
-        else if (selectOrder.length == 0) {
+        else if (selectOrder1.length == 0) {
             const insertOrder = await this.orderRepository.save(order)
             var orderDetail = new OrderDetail()
             orderDetail = order.orderDetail[0]
             orderDetail.orderId = insertOrder.orderId
-            const insertOrderDetail = await this.orderDetailRepository.save(orderDetail)
+            await this.orderDetailRepository.save(orderDetail)
+            this.updateProductOrderPrice(insertOrder.orderId)
         }
     }
 
-    async getProductOrder(email): Promise<any[]> {
+    async getProductOrderByEmail(email): Promise<any[]> {
         const selectProductOrder = await this.orderRepository.find({
             relations: ["orderDetail"],
             where: {
@@ -87,7 +48,90 @@ export class ProductOrderService {
                 orderStatus: 0
             }
         })
+
         return selectProductOrder
+    }
+
+    async getProductOrderById(orderId): Promise<any[]> {
+        const selectProductOrder = await this.orderRepository.find({
+            relations: ["orderDetail"],
+            where: {
+                orderId : orderId
+            }
+        })
+
+        return selectProductOrder
+    }
+
+    async increaseOrderDetailQuantity(orderDetail : OrderDetail){
+        const orderDetailData = await this.orderDetailRepository.find(orderDetail)
+        orderDetail.quantity = orderDetailData[0].quantity+1
+        await this.orderDetailRepository.save(orderDetail)
+    }
+
+    async decreaseOrderDetailQuantity(orderDetail : OrderDetail){
+        const orderDetailData = await this.orderDetailRepository.find(orderDetail)
+        orderDetail.quantity = orderDetailData[0].quantity-1
+        await this.orderDetailRepository.save(orderDetail)
+    }
+
+    async updateProductOrderPrice(orderId) {
+        var totalPrice = 0;
+            const selectOrder = await this.getProductOrderById(orderId)
+                for(var i = 0 ; i < selectOrder[0].orderDetail.length ; i++){
+                const selectProductOrderDetail = await this.orderDetailRepository.find({
+                    relations: ["product"],
+                    where: {
+                        orderId: selectOrder[0].orderDetail[i].orderId,
+                        productId: selectOrder[0].orderDetail[i].productId
+                    }
+                })
+                
+                const categoryId = selectProductOrderDetail[0].product.categoryId
+                if (categoryId == 1) {
+                    const foodAndBevData = await getRepository(FoodAndBev).find({
+                        where: {
+                            foodAndBevId: selectProductOrderDetail[0].product.productId
+                        }
+                    })
+                    console.log("each Price "+foodAndBevData[0].foodAndBevPrice)
+                    var totalFoodAndBevPrice = foodAndBevData[0].foodAndBevPrice * selectProductOrderDetail[0].quantity
+                    totalPrice+= totalFoodAndBevPrice
+
+                }
+                else if (categoryId == 2) {
+                    const electronicData = await getRepository(Electronic).find({
+                        where: {
+                            electronicId: selectProductOrderDetail[0].product.productId
+                        }
+                    })
+                    console.log("each Price "+electronicData[0].electronicPrice)
+                    var totalFoodAndBevPrice = electronicData[0].electronicPrice * selectProductOrderDetail[0].quantity
+                    totalPrice+= totalFoodAndBevPrice
+
+                }
+                else if (categoryId == 3) {
+                    const furnitureData = await getRepository(Furniture).find({
+                        where: {
+                            furnitureId: selectProductOrderDetail[0].product.productId
+                        }
+                    })
+                    console.log("each Price "+furnitureData[0].furniturePrice)
+                    var totalFoodAndBevPrice = furnitureData[0].furniturePrice * selectProductOrderDetail[0].quantity
+                    totalPrice+= totalFoodAndBevPrice
+                }
+            }
+            const selectProductOrder = await this.orderRepository.find({
+                where: {
+                    orderId: selectOrder[0].orderId,
+                }
+            })
+            var updateOrder = new Order()
+            updateOrder = selectProductOrder[0]
+            updateOrder.totalPrice = totalPrice
+            console.log("totalPrice : "+totalPrice)
+            console.log("update Total : "+updateOrder.totalPrice)
+            await this.orderRepository.save(updateOrder)
     }
 
 
