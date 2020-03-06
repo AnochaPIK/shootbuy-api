@@ -15,7 +15,7 @@ export class ProductOrderService {
     ) { }
 
     async insertProductOrder(order: Order) {
-        const selectOrder1 = await this.getProductOrderByEmail(order.email)
+        const selectOrder1 = await this.getProductOrderByUuid(order.uuid)
         if (selectOrder1.length > 0) {
             var orderDetail = new OrderDetail()
             orderDetail.productId = order.orderDetail[0].productId
@@ -40,11 +40,11 @@ export class ProductOrderService {
         }
     }
 
-    async getProductOrderByEmail(email): Promise<any[]> {
+    async getProductOrderByUuid(uuid): Promise<any[]> {
         const selectProductOrder = await this.orderRepository.find({
             relations: ["orderDetail"],
             where: {
-                email: email,
+                uuid: uuid,
                 orderStatus: 0
             }
         })
@@ -56,82 +56,88 @@ export class ProductOrderService {
         const selectProductOrder = await this.orderRepository.find({
             relations: ["orderDetail"],
             where: {
-                orderId : orderId
+                orderId: orderId
             }
         })
 
         return selectProductOrder
     }
 
-    async increaseOrderDetailQuantity(orderDetail : OrderDetail){
+    async increaseOrderDetailQuantity(orderDetail: OrderDetail) {
         const orderDetailData = await this.orderDetailRepository.find(orderDetail)
-        orderDetail.quantity = orderDetailData[0].quantity+1
+        orderDetail.quantity = orderDetailData[0].quantity + 1
         await this.orderDetailRepository.save(orderDetail)
     }
 
-    async decreaseOrderDetailQuantity(orderDetail : OrderDetail){
+    async decreaseOrderDetailQuantity(orderDetail: OrderDetail) {
         const orderDetailData = await this.orderDetailRepository.find(orderDetail)
-        orderDetail.quantity = orderDetailData[0].quantity-1
+        orderDetail.quantity = orderDetailData[0].quantity - 1
         await this.orderDetailRepository.save(orderDetail)
     }
 
     async updateProductOrderPrice(orderId) {
         var totalPrice = 0;
-            const selectOrder = await this.getProductOrderById(orderId)
-                for(var i = 0 ; i < selectOrder[0].orderDetail.length ; i++){
-                const selectProductOrderDetail = await this.orderDetailRepository.find({
-                    relations: ["product"],
-                    where: {
-                        orderId: selectOrder[0].orderDetail[i].orderId,
-                        productId: selectOrder[0].orderDetail[i].productId
-                    }
-                })
-                
-                const categoryId = selectProductOrderDetail[0].product.categoryId
-                if (categoryId == 1) {
-                    const foodAndBevData = await getRepository(FoodAndBev).find({
-                        where: {
-                            foodAndBevId: selectProductOrderDetail[0].product.productId
-                        }
-                    })
-                    console.log("each Price "+foodAndBevData[0].foodAndBevPrice)
-                    var totalFoodAndBevPrice = foodAndBevData[0].foodAndBevPrice * selectProductOrderDetail[0].quantity
-                    totalPrice+= totalFoodAndBevPrice
-
-                }
-                else if (categoryId == 2) {
-                    const electronicData = await getRepository(Electronic).find({
-                        where: {
-                            electronicId: selectProductOrderDetail[0].product.productId
-                        }
-                    })
-                    console.log("each Price "+electronicData[0].electronicPrice)
-                    var totalFoodAndBevPrice = electronicData[0].electronicPrice * selectProductOrderDetail[0].quantity
-                    totalPrice+= totalFoodAndBevPrice
-
-                }
-                else if (categoryId == 3) {
-                    const furnitureData = await getRepository(Furniture).find({
-                        where: {
-                            furnitureId: selectProductOrderDetail[0].product.productId
-                        }
-                    })
-                    console.log("each Price "+furnitureData[0].furniturePrice)
-                    var totalFoodAndBevPrice = furnitureData[0].furniturePrice * selectProductOrderDetail[0].quantity
-                    totalPrice+= totalFoodAndBevPrice
-                }
-            }
-            const selectProductOrder = await this.orderRepository.find({
+        const selectOrder = await this.getProductOrderById(orderId)
+        for (var i = 0; i < selectOrder[0].orderDetail.length; i++) {
+            const selectProductOrderDetail = await this.orderDetailRepository.find({
+                relations: ["product"],
                 where: {
-                    orderId: selectOrder[0].orderId,
+                    orderId: selectOrder[0].orderDetail[i].orderId,
+                    productId: selectOrder[0].orderDetail[i].productId
                 }
             })
-            var updateOrder = new Order()
-            updateOrder = selectProductOrder[0]
-            updateOrder.totalPrice = totalPrice
-            console.log("totalPrice : "+totalPrice)
-            console.log("update Total : "+updateOrder.totalPrice)
-            await this.orderRepository.save(updateOrder)
+
+            const categoryId = selectProductOrderDetail[0].product.categoryId
+            if (categoryId == 1) {
+                const foodAndBevData = await getRepository(FoodAndBev).find({
+                    where: {
+                        foodAndBevId: selectProductOrderDetail[0].product.productId
+                    }
+                })
+                console.log("each Price " + foodAndBevData[0].foodAndBevPrice)
+                var totalFoodAndBevPrice = foodAndBevData[0].foodAndBevPrice * selectProductOrderDetail[0].quantity
+                totalPrice += totalFoodAndBevPrice
+
+            }
+            else if (categoryId == 2) {
+                const electronicData = await getRepository(Electronic).find({
+                    where: {
+                        electronicId: selectProductOrderDetail[0].product.productId
+                    }
+                })
+                console.log("each Price " + electronicData[0].electronicPrice)
+                var totalFoodAndBevPrice = electronicData[0].electronicPrice * selectProductOrderDetail[0].quantity
+                totalPrice += totalFoodAndBevPrice
+
+            }
+            else if (categoryId == 3) {
+                const furnitureData = await getRepository(Furniture).find({
+                    where: {
+                        furnitureId: selectProductOrderDetail[0].product.productId
+                    }
+                })
+                console.log("each Price " + furnitureData[0].furniturePrice)
+                var totalFoodAndBevPrice = furnitureData[0].furniturePrice * selectProductOrderDetail[0].quantity
+                totalPrice += totalFoodAndBevPrice
+            }
+        }
+        const selectProductOrder = await this.orderRepository.find({
+            where: {
+                orderId: selectOrder[0].orderId,
+            }
+        })
+        var updateOrder = new Order()
+        updateOrder = selectProductOrder[0]
+        updateOrder.totalPrice = totalPrice
+        console.log("totalPrice : " + totalPrice)
+        console.log("update Total : " + updateOrder.totalPrice)
+        await this.orderRepository.save(updateOrder)
+    }
+
+    async checkoutProductOrder(order: Order) {
+        order.orderDateTime = null
+        order.orderStatus = 1
+        await this.orderRepository.save(order)
     }
 
 

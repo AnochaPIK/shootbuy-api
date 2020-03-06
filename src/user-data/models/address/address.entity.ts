@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, PrimaryGeneratedColumn, Index } from "typeorm";
 import { User } from "../user/user.entity";
 
 @Entity()
@@ -7,7 +7,7 @@ export class Address {
     addressId : number
 
     @Column()
-    email : string
+    uuid : string
 
     @Column()
     addressNumber : string
@@ -24,8 +24,9 @@ export class Address {
     @Column()
     zipCode : string
 
+    @Index()
     @ManyToOne(type => User,{onUpdate:"CASCADE"})
-    @JoinColumn({ name: "email"})
+    @JoinColumn({ name: "uuid"})
     user: User 
        
 }

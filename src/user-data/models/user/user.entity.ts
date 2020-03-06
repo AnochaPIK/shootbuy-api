@@ -1,10 +1,13 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, OneToMany, Index } from "typeorm";
 import { Address } from "../address/address.entity";
 import { ScanHistory } from "../scan-history/scan-history.entity";
 
 @Entity()
 export class User {
     @PrimaryColumn()
+    uuid : string
+
+    @Column()
     email : string
 
     @Column()

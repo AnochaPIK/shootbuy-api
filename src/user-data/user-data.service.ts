@@ -14,35 +14,45 @@ export class UserDataService {
         @InjectRepository(User) private userRepository: Repository<User>,
     ) { }
 
-    async selectUserData(email): Promise<any[]> {
+    async selectUserData(uuid): Promise<any[]> {
         const query = await this.userRepository.find({
             relations: ["address"],
             where: {
-                email: email
+                uuid: uuid
             }
         })
         return query
+    }
+
+    async ifUserExist(user : User){
+        var userData = await this.userRepository.find({
+            where:{
+                uuid : user.uuid
+            }
+        })
+        if(userData.length == 0 )
+        return await this.userRepository.save(user)
     }
 
     async insertUserAddress(address: Address) {
         return await this.addressRepository.save(address)
     }
 
-    async getUserDataScanHistory(email) {
+    async getUserDataScanHistory(uuid) {
         var selectData = await this.userRepository.createQueryBuilder("user")
         .innerJoinAndSelect("user.scanHistory","scanHistory")
         .innerJoinAndSelect("scanHistory.product","product")
         .innerJoinAndSelect("product.category","category")
-        .where("user.email = :email",{email : email})
+        .where("user.uuid = :uuid",{uuid : uuid})
         .getMany()
         console.log(selectData)
         return selectData
     }
 
-    async insertUserDataScanHistory(scanHistory: ScanHistory) {
+    async insertUserDataScanHistory(scanHistory: ScanHistory) { 
         scanHistory.scanDateTime = null
         await this.scanHistoryRepository.save(scanHistory)
     }
 
-
+ 
 }

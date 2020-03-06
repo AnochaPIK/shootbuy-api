@@ -8,10 +8,10 @@ export class Order {
     orderId : number
 
     @Column()
-    email : string
+    uuid : string
 
     @ManyToOne(type => User,{onUpdate:"CASCADE"})
-    @JoinColumn({ name: "email"})
+    @JoinColumn({ name: "uuid"})
     user: User 
 
     @Column({type:"timestamp"})

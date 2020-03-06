@@ -5,18 +5,18 @@ import { Product } from "src/product-data/models/product/product.entity";
 @Entity()
 export class ScanHistory {
     @PrimaryColumn()
-    email : string
+    uuid : string
 
     @Index()
-    @ManyToOne(type => User,{onUpdate:"CASCADE"})
-    @JoinColumn({name : "email",referencedColumnName:"email"}) 
+    @ManyToOne(type => User,{onUpdate:"CASCADE"}) 
+    @JoinColumn({name : "uuid",referencedColumnName:"uuid"}) 
     user : User
 
     @PrimaryColumn({length:10})
     productId : string
 
     @Index()
-    @ManyToOne(type => Product,{onUpdate:"CASCADE"})
+    @ManyToOne(type => Product,{onUpdate:"CASCADE"}) 
     @JoinColumn({name : "productId",referencedColumnName:"productId"})
     product : Product
     

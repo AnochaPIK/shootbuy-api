@@ -12,9 +12,9 @@ export class ProductOrderController {
         return this.productOrderService.insertProductOrder(order)
     }
 
-    @Get("getProductOrderByEmail/:email")
+    @Get("getProductOrderByUuid/:uuid")
     getProductOrder(@Param() params) : Promise<any[]>{
-        return this.productOrderService.getProductOrderByEmail(params.email)
+        return this.productOrderService.getProductOrderByUuid(params.uuid)
     }
 
     @Post("increaseOrderDetailQuantity")
@@ -25,6 +25,11 @@ export class ProductOrderController {
     @Post("decreaseOrderDetailQuantity")
     decreaseOrderDetailQuantity(@Body() orderDetail:OrderDetail){
         return this.productOrderService.decreaseOrderDetailQuantity(orderDetail)
+    }
+
+    @Post("checkoutProductOrder")
+    checkoutProductOrder(@Body() order:Order){
+        return this.productOrderService.checkoutProductOrder(order)
     }
     
 }
