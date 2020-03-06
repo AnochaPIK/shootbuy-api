@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Param } from '@nestjs/common';
+import { Controller, Body, Post, Get, Param, Res, HttpStatus } from '@nestjs/common';
 import { ProductOrderService } from './product-order.service';
 import { Order } from './models/order/order.entity';
 import { OrderDetail } from './models/order-detail/order-detail.entity';
@@ -9,11 +9,11 @@ export class ProductOrderController {
 
     @Post("insertProductOrder")
     insertProductOrder(@Body() order:Order){
-        return this.productOrderService.insertProductOrder(order)
+         return this.productOrderService.insertProductOrder(order)
     }
 
     @Get("getProductOrderByUuid/:uuid")
-    getProductOrder(@Param() params) : Promise<any[]>{
+    getProductOrderByUuid(@Param() params) : Promise<any[]>{
         return this.productOrderService.getProductOrderByUuid(params.uuid)
     }
 

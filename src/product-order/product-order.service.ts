@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './models/order/order.entity';
 import { Repository, getRepository } from 'typeorm';
@@ -28,7 +28,8 @@ export class ProductOrderService {
             else {
                 await this.orderDetailRepository.save(orderDetail)
             }
-            this.updateProductOrderPrice(selectOrder1[0].orderId)
+            var x = this.updateProductOrderPrice(selectOrder1[0].orderId)
+            
         }
         else if (selectOrder1.length == 0) {
             const insertOrder = await this.orderRepository.save(order)
@@ -38,16 +39,24 @@ export class ProductOrderService {
             await this.orderDetailRepository.save(orderDetail)
             this.updateProductOrderPrice(insertOrder.orderId)
         }
+
+        
     }
 
     async getProductOrderByUuid(uuid): Promise<any[]> {
-        const selectProductOrder = await this.orderRepository.find({
-            relations: ["orderDetail"],
-            where: {
-                uuid: uuid,
-                orderStatus: 0
-            }
-        })
+        // const selectProductOrder = await this.orderRepository.find({
+        //     relations: ["orderDetail"],
+        //     where: {
+        //         uuid: uuid,
+        //         orderStatus: 0
+        //     }
+        // })
+        const selectProductOrder = await this.orderRepository.createQueryBuilder("order")
+        .innerJoinAndSelect("order.orderDetail","orderDetail")
+        .innerJoinAndSelect("orderDetail.product","product")
+        .where("order.uuid = :uuid",{uuid:uuid})
+        .andWhere("order.orderStatus = 0")
+        .getMany()
 
         return selectProductOrder
     }
@@ -132,6 +141,8 @@ export class ProductOrderService {
         console.log("totalPrice : " + totalPrice)
         console.log("update Total : " + updateOrder.totalPrice)
         await this.orderRepository.save(updateOrder)
+
+        
     }
 
     async checkoutProductOrder(order: Order) {
