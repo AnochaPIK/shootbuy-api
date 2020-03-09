@@ -18,11 +18,19 @@ export class ProductOrderService {
         const selectOrder1 = await this.getProductOrderByUuid(order.uuid)
         if (selectOrder1.length > 0) {
             var orderDetail = new OrderDetail()
-            orderDetail.productId = order.orderDetail[0].productId
+            orderDetail = order.orderDetail[0]
             orderDetail.orderId = selectOrder1[0].orderId
-            const orderDetailIsExist = await this.orderDetailRepository.find(orderDetail)
+            const orderDetailIsExist = await this.orderDetailRepository.find({
+                where:{
+                    orderId : orderDetail.orderId,
+                    productId : orderDetail.productId
+                }
+            })
             if (orderDetailIsExist.length > 0) {
-                orderDetailIsExist[0].quantity++
+                if(orderDetail.quantity != null)
+                orderDetailIsExist[0].quantity += orderDetail.quantity
+                else
+                orderDetailIsExist[0].quantity ++
                 await this.orderDetailRepository.save(orderDetailIsExist)
             }
             else {
@@ -44,24 +52,26 @@ export class ProductOrderService {
     }
 
     async getProductOrderByUuid(uuid): Promise<any[]> {
-        // const selectProductOrder = await this.orderRepository.find({
-        //     relations: ["orderDetail"],
-        //     where: {
-        //         uuid: uuid,
-        //         orderStatus: 0
-        //     }
-        // })
         const selectProductOrder = await this.orderRepository.createQueryBuilder("order")
         .innerJoinAndSelect("order.orderDetail","orderDetail")
         .innerJoinAndSelect("orderDetail.product","product")
         .where("order.uuid = :uuid",{uuid:uuid})
         .andWhere("order.orderStatus = 0")
         .getMany()
-
         return selectProductOrder
     }
 
-    async getProductOrderById(orderId): Promise<any[]> {
+    async getAllProductOrderByUuid(uuid): Promise<any[]> {
+        const selectProductOrder = await this.orderRepository.createQueryBuilder("order")
+        .innerJoinAndSelect("order.orderDetail","orderDetail")
+        .innerJoinAndSelect("orderDetail.product","product")
+        .where("order.uuid = :uuid",{uuid:uuid})
+        .andWhere("order.orderStatus != 0")
+        .getMany()
+        return selectProductOrder
+    } 
+
+    async getProductOrderByOrderId(orderId): Promise<any[]> {
         const selectProductOrder = await this.orderRepository.find({
             relations: ["orderDetail"],
             where: {
@@ -76,17 +86,20 @@ export class ProductOrderService {
         const orderDetailData = await this.orderDetailRepository.find(orderDetail)
         orderDetail.quantity = orderDetailData[0].quantity + 1
         await this.orderDetailRepository.save(orderDetail)
+        this.updateProductOrderPrice(orderDetail.orderId)
     }
 
     async decreaseOrderDetailQuantity(orderDetail: OrderDetail) {
         const orderDetailData = await this.orderDetailRepository.find(orderDetail)
         orderDetail.quantity = orderDetailData[0].quantity - 1
         await this.orderDetailRepository.save(orderDetail)
+        this.updateProductOrderPrice(orderDetail.orderId)
+
     }
 
     async updateProductOrderPrice(orderId) {
         var totalPrice = 0;
-        const selectOrder = await this.getProductOrderById(orderId)
+        const selectOrder = await this.getProductOrderByOrderId(orderId)
         for (var i = 0; i < selectOrder[0].orderDetail.length; i++) {
             const selectProductOrderDetail = await this.orderDetailRepository.find({
                 relations: ["product"],
@@ -106,6 +119,7 @@ export class ProductOrderService {
                 console.log("each Price " + foodAndBevData[0].foodAndBevPrice)
                 var totalFoodAndBevPrice = foodAndBevData[0].foodAndBevPrice * selectProductOrderDetail[0].quantity
                 totalPrice += totalFoodAndBevPrice
+                console.log("Food Price " + totalFoodAndBevPrice)
 
             }
             else if (categoryId == 2) {
@@ -115,8 +129,10 @@ export class ProductOrderService {
                     }
                 })
                 console.log("each Price " + electronicData[0].electronicPrice)
-                var totalFoodAndBevPrice = electronicData[0].electronicPrice * selectProductOrderDetail[0].quantity
-                totalPrice += totalFoodAndBevPrice
+                var totalElectronicPrice = electronicData[0].electronicPrice * selectProductOrderDetail[0].quantity
+                totalPrice += totalElectronicPrice
+                console.log("Electronic Price " + totalElectronicPrice)
+
 
             }
             else if (categoryId == 3) {
@@ -126,8 +142,10 @@ export class ProductOrderService {
                     }
                 })
                 console.log("each Price " + furnitureData[0].furniturePrice)
-                var totalFoodAndBevPrice = furnitureData[0].furniturePrice * selectProductOrderDetail[0].quantity
-                totalPrice += totalFoodAndBevPrice
+                var totalFurniturePrice = furnitureData[0].furniturePrice * selectProductOrderDetail[0].quantity
+                totalPrice += totalFurniturePrice
+                console.log("Furniture Price " + totalFurniturePrice)
+
             }
         }
         const selectProductOrder = await this.orderRepository.find({
@@ -145,7 +163,13 @@ export class ProductOrderService {
         
     }
 
-    async checkoutProductOrder(order: Order) {
+    async checkoutProductOrder(orderId) {
+        const orderList = await this.orderRepository.find({
+            where:{
+                orderId : orderId
+            }
+        })
+        var order = orderList[0]
         order.orderDateTime = null
         order.orderStatus = 1
         await this.orderRepository.save(order)

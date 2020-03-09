@@ -17,6 +17,15 @@ export class ProductOrderController {
         return this.productOrderService.getProductOrderByUuid(params.uuid)
     }
 
+    @Get("getAllProductOrderByUuid/:uuid")
+    getAllProductOrderByUuid(@Param() params) : Promise<any[]>{
+        return this.productOrderService.getAllProductOrderByUuid(params.uuid)
+    }
+    
+    @Get("getProductOrderByOrderId/:orderId")
+    getProductOrderByOrderId(@Param() params) : Promise<any[]>{
+        return this.productOrderService.getProductOrderByOrderId(params.orderId)
+    }
     @Post("increaseOrderDetailQuantity")
     increaseOrderDetailQuantity(@Body() orderDetail:OrderDetail){
         return this.productOrderService.increaseOrderDetailQuantity(orderDetail)
@@ -27,9 +36,9 @@ export class ProductOrderController {
         return this.productOrderService.decreaseOrderDetailQuantity(orderDetail)
     }
 
-    @Post("checkoutProductOrder")
-    checkoutProductOrder(@Body() order:Order){
-        return this.productOrderService.checkoutProductOrder(order)
+    @Get("checkoutProductOrder/:orderId")
+    checkoutProductOrder(@Param() params){
+        return this.productOrderService.checkoutProductOrder(params.orderId)
     }
     
 }

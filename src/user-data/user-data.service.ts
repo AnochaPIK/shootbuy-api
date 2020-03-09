@@ -14,13 +14,18 @@ export class UserDataService {
         @InjectRepository(User) private userRepository: Repository<User>,
     ) { }
 
-    async selectUserData(uuid): Promise<any[]> {
+    async getUserAddressByUuid(uuid): Promise<any[]> {
         const query = await this.userRepository.find({
             relations: ["address"],
             where: {
                 uuid: uuid
             }
         })
+        return query
+    }
+
+    async getUserList(): Promise<any[]>{
+        const query = await this.userRepository.find()
         return query
     }
 

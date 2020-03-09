@@ -8,11 +8,16 @@ import { User } from './models/user/user.entity';
 export class UserDataController {
     constructor(private userDataService:UserDataService){}
 
-    @Get("selectUserData/:uuid")
-    selectUserData(@Param() params) : Promise<any[]>{
-        return this.userDataService.selectUserData(params.uuid)
+    @Get("getUserAddressByUuid/:uuid")
+    getUserAddressByUuid(@Param() params) : Promise<any[]>{
+        return this.userDataService.getUserAddressByUuid(params.uuid)
     }
 
+    @Get("getUserList/")
+    getUserList() : Promise<any[]>{
+        return this.userDataService.getUserList()
+    }
+    
     @Post("insertUserAddress/")
     insertUserAddress(@Body() address:Address){
         return this.userDataService.insertUserAddress(address)
