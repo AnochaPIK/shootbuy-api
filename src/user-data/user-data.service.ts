@@ -5,7 +5,7 @@ import { ScanHistory } from './models/scan-history/scan-history.entity';
 import { User } from './models/user/user.entity';
 import { Repository } from 'typeorm';
 import { Product } from 'src/product-data/models/product/product.entity';
-
+import * as moment from 'moment'
 @Injectable()
 export class UserDataService {
     constructor(
@@ -50,7 +50,9 @@ export class UserDataService {
         .innerJoinAndSelect("product.category","category")
         .where("user.uuid = :uuid",{uuid : uuid})
         .getMany()
-        console.log(selectData)
+        // selectProductOrder[0].orderDateTime = moment(selectProductOrder[0].orderDateTime).format('DD-MM-YYYY')
+
+        selectData[0].scanHistory.forEach(ScanHistory => ScanHistory.scanDateTime = moment(ScanHistory.scanDateTime).format('DD/MM/YYYY'))
         return selectData
     }
 

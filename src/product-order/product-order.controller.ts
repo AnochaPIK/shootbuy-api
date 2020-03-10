@@ -36,9 +36,9 @@ export class ProductOrderController {
         return this.productOrderService.decreaseOrderDetailQuantity(orderDetail)
     }
 
-    @Get("checkoutProductOrder/:orderId")
-    checkoutProductOrder(@Param() params){
-        return this.productOrderService.checkoutProductOrder(params.orderId)
+    @Post("checkoutProductOrder")
+    checkoutProductOrder(@Body() order:Order){
+        return this.productOrderService.checkoutProductOrder(order)
     }
     
 }

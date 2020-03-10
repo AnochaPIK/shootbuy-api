@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { User } from "src/user-data/models/user/user.entity";
 import { OrderDetail } from "../order-detail/order-detail.entity";
+import { Address } from "src/user-data/models/address/address.entity";
 
 @Entity()
 export class Order {
@@ -10,12 +11,15 @@ export class Order {
     @Column()
     uuid : string
 
+    @Column({default:null})
+    addressId : number
+
     @ManyToOne(type => User,{onUpdate:"CASCADE"})
     @JoinColumn({ name: "uuid"})
     user: User 
 
     @Column({type:"timestamp"})
-    orderDateTime : Date
+    orderDateTime : string
 
     @Column({default : 0})
     totalPrice : number
@@ -25,5 +29,6 @@ export class Order {
 
     @OneToMany(type => OrderDetail,orderDetail => orderDetail.order)
     orderDetail: OrderDetail[]
+
 
 }

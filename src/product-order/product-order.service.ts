@@ -1,3 +1,4 @@
+import * as moment from 'moment'
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './models/order/order.entity';
@@ -21,23 +22,23 @@ export class ProductOrderService {
             orderDetail = order.orderDetail[0]
             orderDetail.orderId = selectOrder1[0].orderId
             const orderDetailIsExist = await this.orderDetailRepository.find({
-                where:{
-                    orderId : orderDetail.orderId,
-                    productId : orderDetail.productId
+                where: {
+                    orderId: orderDetail.orderId,
+                    productId: orderDetail.productId
                 }
             })
             if (orderDetailIsExist.length > 0) {
-                if(orderDetail.quantity != null)
-                orderDetailIsExist[0].quantity += orderDetail.quantity
+                if (orderDetail.quantity != null)
+                    orderDetailIsExist[0].quantity += orderDetail.quantity
                 else
-                orderDetailIsExist[0].quantity ++
+                    orderDetailIsExist[0].quantity++
                 await this.orderDetailRepository.save(orderDetailIsExist)
             }
             else {
                 await this.orderDetailRepository.save(orderDetail)
             }
             var x = this.updateProductOrderPrice(selectOrder1[0].orderId)
-            
+
         }
         else if (selectOrder1.length == 0) {
             const insertOrder = await this.orderRepository.save(order)
@@ -48,37 +49,38 @@ export class ProductOrderService {
             this.updateProductOrderPrice(insertOrder.orderId)
         }
 
-        
+
     }
 
     async getProductOrderByUuid(uuid): Promise<any[]> {
         const selectProductOrder = await this.orderRepository.createQueryBuilder("order")
-        .innerJoinAndSelect("order.orderDetail","orderDetail")
-        .innerJoinAndSelect("orderDetail.product","product")
-        .where("order.uuid = :uuid",{uuid:uuid})
-        .andWhere("order.orderStatus = 0")
-        .getMany()
+            .innerJoinAndSelect("order.orderDetail", "orderDetail")
+            .innerJoinAndSelect("orderDetail.product", "product")
+            .where("order.uuid = :uuid", { uuid: uuid })
+            .andWhere("order.orderStatus = 0")
+            .getMany()
         return selectProductOrder
     }
 
     async getAllProductOrderByUuid(uuid): Promise<any[]> {
         const selectProductOrder = await this.orderRepository.createQueryBuilder("order")
-        .innerJoinAndSelect("order.orderDetail","orderDetail")
-        .innerJoinAndSelect("orderDetail.product","product")
-        .where("order.uuid = :uuid",{uuid:uuid})
-        .andWhere("order.orderStatus != 0")
-        .getMany()
+            .innerJoinAndSelect("order.orderDetail", "orderDetail")
+            .innerJoinAndSelect("orderDetail.product", "product")
+            .where("order.uuid = :uuid", { uuid: uuid })
+            .andWhere("order.orderStatus != 0")
+            .getMany()
         return selectProductOrder
-    } 
+    }
 
     async getProductOrderByOrderId(orderId): Promise<any[]> {
-        const selectProductOrder = await this.orderRepository.find({
-            relations: ["orderDetail"],
-            where: {
-                orderId: orderId
-            }
-        })
-
+        const selectProductOrder = await this.orderRepository.createQueryBuilder("order")
+            // .select("DATE_FORMAT(order.orderDateTime,'%d/%m%Y') as orderDateTime")
+            // .select("order.orderDateTime")
+            .innerJoinAndSelect("order.orderDetail", "orderDetail")
+            .innerJoinAndSelect("orderDetail.product", "product")
+            .where("order.orderId = :orderId", { orderId: orderId })
+            .getMany()
+        selectProductOrder[0].orderDateTime = moment(selectProductOrder[0].orderDateTime).format('DD-MM-YYYY')
         return selectProductOrder
     }
 
@@ -132,8 +134,6 @@ export class ProductOrderService {
                 var totalElectronicPrice = electronicData[0].electronicPrice * selectProductOrderDetail[0].quantity
                 totalPrice += totalElectronicPrice
                 console.log("Electronic Price " + totalElectronicPrice)
-
-
             }
             else if (categoryId == 3) {
                 const furnitureData = await getRepository(Furniture).find({
@@ -160,19 +160,23 @@ export class ProductOrderService {
         console.log("update Total : " + updateOrder.totalPrice)
         await this.orderRepository.save(updateOrder)
 
-        
+
     }
 
-    async checkoutProductOrder(orderId) {
+    async checkoutProductOrder(order: Order) {
+        console.log(order)
         const orderList = await this.orderRepository.find({
-            where:{
-                orderId : orderId
+            where: {
+                orderId: order.orderId
             }
         })
-        var order = orderList[0]
-        order.orderDateTime = null
-        order.orderStatus = 1
-        await this.orderRepository.save(order)
+        
+        var saveOrder = orderList[0]
+        console.log(saveOrder)
+        // saveOrder.orderDateTime = null
+        saveOrder.orderStatus = 1
+         saveOrder.addressId = order.addressId
+        await this.orderRepository.save(saveOrder)
     }
 
 

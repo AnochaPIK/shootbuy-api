@@ -1,9 +1,9 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, ManyToMany, JoinTable, Index, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../user/user.entity";
 import { Product } from "src/product-data/models/product/product.entity";
-
 @Entity()
 export class ScanHistory {
+
     @PrimaryColumn()
     uuid : string
 
@@ -20,6 +20,6 @@ export class ScanHistory {
     @JoinColumn({name : "productId",referencedColumnName:"productId"})
     product : Product
     
-    @Column({type:'timestamp'})
-    scanDateTime : Date
+    @PrimaryColumn({type:'timestamp'})
+    scanDateTime : string 
 }
