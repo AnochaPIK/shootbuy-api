@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column, OneToOne, OneToMany, Index } from "typeorm";
 import { Address } from "../address/address.entity";
 import { ScanHistory } from "../scan-history/scan-history.entity";
+import { Order } from "src/product-order/models/order/order.entity";
 
 @Entity()
 export class User {
@@ -21,4 +22,7 @@ export class User {
 
     @OneToMany(type => ScanHistory,scanHistory => scanHistory.user)
     scanHistory : ScanHistory[]
+
+    @OneToMany(type => Order,order => order.user)
+    order : Order[]
 }

@@ -25,7 +25,11 @@ export class UserDataService {
     }
 
     async getUserList(): Promise<any[]>{
-        const query = await this.userRepository.find()
+        const query = await this.userRepository.createQueryBuilder("user")
+        .leftJoinAndSelect("user.order","order")
+        .leftJoinAndSelect("order.orderDetail","orderDetail")
+        .leftJoinAndSelect("orderDetail.product", "product")
+        .getMany()
         return query
     }
 
