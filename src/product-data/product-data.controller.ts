@@ -25,4 +25,9 @@ export class ProductDataController {
         return this.productDataService.selectProductElectronic(params.label)
     }
 
+    @Get("selectProductList")
+    selectProductList() : Promise<any[]>{
+        return this.productDataService.selectProductList()
+    }
+
 }

@@ -60,5 +60,12 @@ export class ProductDataService {
         return query
     }
 
+    async selectProductList(): Promise<any[]>{
+        const query = await this.productRepository.find({
+            relations:["category"]
+        })
+        return query
+    }
+
 
 }

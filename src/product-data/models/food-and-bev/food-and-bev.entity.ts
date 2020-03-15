@@ -36,4 +36,5 @@ export class FoodAndBev {
 
     @Column({default:0})
     foodAndBevAmount:number
+
 }
