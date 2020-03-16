@@ -28,7 +28,7 @@ export class UserDataService {
         const query = await this.userRepository.createQueryBuilder("user")
         .leftJoinAndSelect("user.order","order")
         .leftJoinAndSelect("order.orderDetail","orderDetail")
-        .leftJoinAndSelect("orderDetail.product", "product")
+        .leftJoinAndSelect("orderDetail.product", "product").where("order.orderStatus != 0")
         .getMany()
         return query
     }
