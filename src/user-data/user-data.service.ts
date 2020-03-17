@@ -31,6 +31,7 @@ export class UserDataService {
       .innerJoinAndSelect('user.order', 'order')
       .innerJoinAndSelect('order.orderDetail', 'orderDetail')
       .innerJoinAndSelect('orderDetail.product', 'product')
+      .where('order.orderStatus != 0')
       .getMany();
     return query;
   }
