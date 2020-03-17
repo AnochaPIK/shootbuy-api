@@ -13,6 +13,11 @@ export class UserDataController {
     return this.userDataService.getUserAddressByUuid(params.uuid);
   }
 
+  @Get('getUserAddressByAddressId/:addressId')
+  getUserAddressByAddressId(@Param() params): Promise<any> {
+    return this.userDataService.getUserAddressByAddressId(params.addressId);
+  }
+
   @Get('getUserList/')
   getUserList(): Promise<any[]> {
     return this.userDataService.getUserList();
@@ -42,4 +47,7 @@ export class UserDataController {
   ifUserExist(@Body() user: User) {
     return this.userDataService.ifUserExist(user);
   }
+
+
+  
 }

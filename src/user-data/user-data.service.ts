@@ -25,12 +25,21 @@ export class UserDataService {
     return query;
   }
 
+  async getUserAddressByAddressId(addressId): Promise<any> {
+    const query = await this.addressRepository.findOne({
+      where: {
+        addressId: addressId,
+      },
+    });
+    return query;
+  }
+
   async getUserList(): Promise<any[]> {
     const query = await this.userRepository
       .createQueryBuilder('user')
-      .innerJoinAndSelect('user.order', 'order')
-      .innerJoinAndSelect('order.orderDetail', 'orderDetail')
-      .innerJoinAndSelect('orderDetail.product', 'product')
+      .leftJoinAndSelect('user.order', 'order')
+      .leftJoinAndSelect('order.orderDetail', 'orderDetail')
+      .leftJoinAndSelect('orderDetail.product', 'product')
       .where('order.orderStatus != 0')
       .getMany();
     return query;
