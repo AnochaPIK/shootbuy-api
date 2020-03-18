@@ -7,6 +7,7 @@ import { Electronic } from './models/electronic/electronic.entity';
 import { FoodAndBev } from './models/food-and-bev/food-and-bev.entity';
 import { Furniture } from './models/furniture/furniture.entity';
 import { Product } from './models/product/product.entity';
+import { Tile } from './models/tile/tile.entity';
 
 @Injectable()
 export class ProductDataService {
@@ -21,6 +22,7 @@ export class ProductDataService {
     @InjectRepository(Furniture)
     private furnitureRepository: Repository<Furniture>,
     @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectRepository(Tile) private tileRepository: Repository<Tile>,
   ) {}
 
   async selectProductType(label): Promise<Product[]> {
@@ -64,6 +66,15 @@ export class ProductDataService {
     return query;
   }
 
+  async selectProductTileData(label): Promise<any[]> {
+    const query = await this.tileRepository.find({
+      where: {
+        tileId: label,
+      },
+    });
+    return query;
+  }
+
   async selectProductList(): Promise<any[]> {
     const query = await this.productRepository.find({
       relations: ['category'],
@@ -91,6 +102,14 @@ export class ProductDataService {
     const query = await this.electronicRepository
       .createQueryBuilder('electronic')
       .where('electronic.electronicId != :productId ', { productId: productId })
+      .getMany();
+    return query;
+  }
+
+  async selectOtherProductTile(productId): Promise<any[]> {
+    const query = await this.tileRepository
+      .createQueryBuilder('tile')
+      .where('tile.tileId != :productId ', { productId: productId })
       .getMany();
     return query;
   }

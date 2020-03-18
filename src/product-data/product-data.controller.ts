@@ -25,6 +25,11 @@ export class ProductDataController {
     return this.productDataService.selectProductElectronic(params.label);
   }
 
+  @Get('selectProductTileData/:label')
+  selectProductTileData(@Param() params): Promise<any[]> {
+    return this.productDataService.selectProductTileData(params.label);
+  }
+
   @Get('selectProductList')
   selectProductList(): Promise<any[]> {
     return this.productDataService.selectProductList();
@@ -49,5 +54,10 @@ export class ProductDataController {
     return this.productDataService.selectOtherProductElectronic(
       params.productId,
     );
+  }
+
+  @Get('selectOtherProductTile/:productId')
+  selectOtherProductTile(@Param() params) {
+    return this.productDataService.selectOtherProductTile(params.productId);
   }
 }

@@ -8,9 +8,10 @@ import { Electronic } from './models/electronic/electronic.entity';
 import { FoodAndBev } from './models/food-and-bev/food-and-bev.entity';
 import { Furniture } from './models/furniture/furniture.entity';
 import { Product } from './models/product/product.entity';
+import { Tile } from './models/tile/tile.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category,Color,Electronic,FoodAndBev,Furniture,Product])], 
+  imports: [TypeOrmModule.forFeature([Category,Color,Electronic,FoodAndBev,Furniture,Product,Tile])], 
   providers: [ProductDataService],
   controllers: [ProductDataController]
 })

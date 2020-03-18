@@ -10,6 +10,7 @@ import {
 import { ProductOrderService } from './product-order.service';
 import { Order } from './models/order/order.entity';
 import { OrderDetail } from './models/order-detail/order-detail.entity';
+import { SellerOrder } from './models/seller-order/seller-order.entity';
 
 @Controller('product-order')
 export class ProductOrderController {
@@ -52,5 +53,10 @@ export class ProductOrderController {
   @Post('confirmProductOrder')
   confirmProductOrder(@Body() order: Order) {
     return this.productOrderService.confirmProductOrder(order);
+  }
+
+  @Post('assignSellerOrder')
+  assignSellerOrder(@Body() sellerOrder: SellerOrder) {
+    return this.productOrderService.assignSellerOrder(sellerOrder);
   }
 }

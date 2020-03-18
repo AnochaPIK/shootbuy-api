@@ -17,30 +17,28 @@ export class Tile {
 
   @Column({})
   tileBrand: string;
+
   @Column({})
   tileModel: string;
-
-  @Column({})
-  tileTexture: string;
-
-  @Column({})
-  tilePattern: string;
 
   @Column({})
   tileSize: string;
 
   @Column({ type: 'double' })
-  tilePricePerSquareMeter: number;
+  tileKgsPerCtn: number;
 
   @Column({ type: 'double' })
-  tileSquareMeterPerUnit: number;
+  tileSquareMeterPerCtn: number;
 
   @Column({})
-  tileQuantityPerUnit: number;
+  tileSquareFTPerCtn: number;
 
   @Column({ type: 'double' })
-  tileQuantityPerSquareMeter: number;
+  tileQuantity: number;
 
   @Column({ type: 'double' })
-  tilePricePerBox: number;
+  tilePrice: number;
+
+  @Column()
+  tileImage: string;
 }

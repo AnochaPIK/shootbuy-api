@@ -3,6 +3,7 @@ import { UserDataService } from './user-data.service';
 import { Address } from './models/address/address.entity';
 import { ScanHistory } from './models/scan-history/scan-history.entity';
 import { User } from './models/user/user.entity';
+import { Seller } from './models/seller/seller.entity';
 
 @Controller('user-data')
 export class UserDataController {
@@ -48,6 +49,8 @@ export class UserDataController {
     return this.userDataService.ifUserExist(user);
   }
 
-
-  
+  @Post('ifSellerExist/')
+  ifSellerExist(@Body() seller: Seller) {
+    return this.userDataService.ifSellerExist(seller);
+  }
 }

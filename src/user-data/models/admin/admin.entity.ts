@@ -9,24 +9,23 @@ import {
   Index,
 } from 'typeorm';
 import { SellerOrder } from 'src/product-order/models/seller-order/seller-order.entity';
-
 @Entity()
-export class Seller {
+export class Admin {
   @PrimaryColumn()
-  sellerUuid: string;
+  adminUuid: string;
 
   @Column()
-  sellerEmail: string;
+  adminEmail: string;
 
   @Column()
-  sellerFirstName: string;
+  adminFirstName: string;
 
   @Column()
-  sellerLastName: string;
+  adminLastName: string;
 
   @OneToMany(
     type => SellerOrder,
-    sellerOrder => sellerOrder.seller,
+    sellerOrder => sellerOrder.admin,
   )
   sellerOrder: SellerOrder[];
 }

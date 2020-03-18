@@ -6,6 +6,8 @@ import { User } from './models/user/user.entity';
 import { Repository } from 'typeorm';
 import { Product } from 'src/product-data/models/product/product.entity';
 import * as moment from 'moment';
+import { Admin } from './models/admin/admin.entity';
+import { Seller } from './models/seller/seller.entity';
 @Injectable()
 export class UserDataService {
   constructor(
@@ -13,6 +15,8 @@ export class UserDataService {
     @InjectRepository(ScanHistory)
     private scanHistoryRepository: Repository<ScanHistory>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Admin) private adminRepository: Repository<Admin>,
+    @InjectRepository(Seller) private sellerRepository: Repository<Seller>,
   ) {}
 
   async getUserAddressByUuid(uuid): Promise<any[]> {
@@ -55,6 +59,18 @@ export class UserDataService {
       return await this.userRepository.save(user);
     }
     return userData[0];
+  }
+
+  async ifSellerExist(seller: Seller) {
+    var sellerData = await this.sellerRepository.find({
+      where: {
+        sellerUuid: seller.sellerUuid,
+      },
+    });
+    if (sellerData.length == 0) {
+      return await this.sellerRepository.save(seller);
+    }
+    return sellerData[0];
   }
 
   async checkUserRole(uuid): Promise<any[]> {

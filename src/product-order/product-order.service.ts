@@ -7,6 +7,8 @@ import { OrderDetail } from './models/order-detail/order-detail.entity';
 import { FoodAndBev } from 'src/product-data/models/food-and-bev/food-and-bev.entity';
 import { Electronic } from 'src/product-data/models/electronic/electronic.entity';
 import { Furniture } from 'src/product-data/models/furniture/furniture.entity';
+import { SellerOrder } from './models/seller-order/seller-order.entity';
+import { Tile } from 'src/product-data/models/tile/tile.entity';
 
 @Injectable()
 export class ProductOrderService {
@@ -14,6 +16,8 @@ export class ProductOrderService {
     @InjectRepository(Order) private orderRepository: Repository<Order>,
     @InjectRepository(OrderDetail)
     private orderDetailRepository: Repository<OrderDetail>,
+    @InjectRepository(SellerOrder)
+    private sellerOrderRepository: Repository<SellerOrder>,
   ) {}
 
   async insertProductOrder(order: Order) {
@@ -147,6 +151,18 @@ export class ProductOrderService {
           selectProductOrderDetail[0].quantity;
         totalPrice += totalFurniturePrice;
         console.log('Furniture Price ' + totalFurniturePrice);
+      } else if (categoryId == 4) {
+        const tileData = await getRepository(Tile).find({
+          where: {
+            tileId: selectProductOrderDetail[0].product.productId,
+          },
+        });
+        console.log('each Price ' + tileData[0].tilePrice);
+        var totalTilePrice =
+        tileData[0].tilePrice *
+          selectProductOrderDetail[0].quantity;
+        totalPrice += totalTilePrice;
+        console.log('Tile Price ' + totalTilePrice);
       }
     }
     const selectProductOrder = await this.orderRepository.find({
@@ -179,23 +195,19 @@ export class ProductOrderService {
   }
 
   async confirmProductOrder(order: Order) {
-    console.log(order);
     const orderList = await this.orderRepository.find({
       where: {
         orderId: order.orderId,
       },
     });
     var saveOrder = orderList[0];
-    console.log('DateTime');
-    console.log(saveOrder.orderDateTime);
-    console.log('orderDateTime');
-    console.log(orderList[0].orderDateTime);
     saveOrder.orderStatus = 2;
-    // saveOrder.orderDateTime = orderList[0].orderDateTime;
     saveOrder.orderDateTime = orderList[0].orderDateTime;
-
-    console.log('Save Order');
-    console.log(saveOrder);
     return await this.orderRepository.save(saveOrder);
+  }
+
+  async assignSellerOrder(sellerOrder: SellerOrder) {
+    sellerOrder.assignDate = new Date(Date.now());
+    await this.sellerOrderRepository.save(sellerOrder);
   }
 }
