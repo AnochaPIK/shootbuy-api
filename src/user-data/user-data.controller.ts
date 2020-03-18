@@ -24,6 +24,11 @@ export class UserDataController {
     return this.userDataService.getUserList();
   }
 
+  @Get('getSellerList/:sellerUuid')
+  getSellerList(@Param() params): Promise<any[]> {
+    return this.userDataService.getSellerList(params.sellerUuid);
+  }
+
   @Post('insertUserAddress/')
   insertUserAddress(@Body() address: Address) {
     return this.userDataService.insertUserAddress(address);

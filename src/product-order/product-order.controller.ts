@@ -59,4 +59,9 @@ export class ProductOrderController {
   assignSellerOrder(@Body() sellerOrder: SellerOrder) {
     return this.productOrderService.assignSellerOrder(sellerOrder);
   }
+
+  @Get('getSellerOrderList/:sellerUuid')
+  getSellerOrderList(@Param() params) {
+    return this.productOrderService.getSellerOrderList(params.sellerUuid);
+  }
 }

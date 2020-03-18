@@ -26,9 +26,6 @@ export class User {
   @Column()
   lastName: string;
 
-  @Column({ default: 1 })
-  role: number;
-
   @OneToMany(
     type => Address,
     address => address.user,
