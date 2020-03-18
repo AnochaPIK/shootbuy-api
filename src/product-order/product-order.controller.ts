@@ -64,4 +64,9 @@ export class ProductOrderController {
   getSellerOrderList(@Param() params) {
     return this.productOrderService.getSellerOrderList(params.sellerUuid);
   }
+  
+  @Post('confirmSellerOrder')
+  confirmSellerOrder(@Body() sellerOrder:SellerOrder) {
+    return this.productOrderService.confirmSellerOrder(sellerOrder);
+  }
 }

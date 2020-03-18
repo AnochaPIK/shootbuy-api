@@ -221,4 +221,24 @@ export class ProductOrderService {
     return sellerOrderList
 
   }
+
+  async confirmSellerOrder(sellerOrder:SellerOrder){
+    const data = await this.sellerOrderRepository.findOne({
+      where:{
+        orderId:sellerOrder.orderId
+      }
+    })
+    data.finishDate = new Date(Date.now());
+    data.sellerOrderStatus = 1
+    
+    const orderData = await this.orderRepository.findOne({
+      where:{
+        orderId:sellerOrder.orderId
+      }
+    })
+    orderData.orderStatus = 3
+
+    await this.sellerOrderRepository.save(data)
+    await this.orderRepository.save(orderData)
+  }
 }
