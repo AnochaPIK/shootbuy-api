@@ -81,10 +81,10 @@ export class UserDataService {
     return sellerData[0];
   }
 
-  async ifAdminExist(admin: Admin) {
+  async ifAdminExist(uuid): Promise<any[]> {
     var adminData = await this.adminRepository.find({
       where: {
-        adminUuid: admin.adminUuid
+        adminUuid: uuid
       },
     });
     return adminData;

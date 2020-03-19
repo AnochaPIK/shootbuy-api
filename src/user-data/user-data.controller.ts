@@ -60,8 +60,8 @@ export class UserDataController {
     return this.userDataService.ifSellerExist(seller);
   }
   
-  @Post('ifAdminExist/')
-  ifAdminExist(@Body() admin: Admin) {
-    return this.userDataService.ifAdminExist(admin);
+  @Get('ifAdminExist/:uuid')
+  ifAdminExist(@Param() param) {
+    return this.userDataService.ifAdminExist(param.uuid);
   }
 }

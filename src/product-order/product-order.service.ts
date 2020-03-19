@@ -214,6 +214,14 @@ export class ProductOrderService {
   async assignSellerOrder(sellerOrder: SellerOrder) {
     sellerOrder.assignDate = new Date(Date.now());
     await this.sellerOrderRepository.save(sellerOrder);
+
+    var data = await this.orderRepository.findOne({
+      where:{
+        orderId:sellerOrder.orderId
+      }
+    })
+    data.orderStatus = 2
+    await this.orderRepository.save(data)
   }
 
   async getSellerOrderList(selleruuid) {
