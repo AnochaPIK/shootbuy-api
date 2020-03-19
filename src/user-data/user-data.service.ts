@@ -81,6 +81,15 @@ export class UserDataService {
     return sellerData[0];
   }
 
+  async ifAdminExist(admin: Admin) {
+    var adminData = await this.adminRepository.find({
+      where: {
+        adminUuid: admin.adminUuid
+      },
+    });
+    return adminData;
+  }
+
   async checkUserRole(uuid): Promise<any[]> {
     var userData = await this.userRepository.find({
       where: {
