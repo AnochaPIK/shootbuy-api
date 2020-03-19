@@ -1,5 +1,11 @@
 import * as moment from 'moment';
-import { Injectable, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpStatus,
+  UploadedFile,
+  Res,
+  Param,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './models/order/order.entity';
 import { Repository, getRepository } from 'typeorm';
@@ -159,8 +165,7 @@ export class ProductOrderService {
         });
         console.log('each Price ' + tileData[0].tilePrice);
         var totalTilePrice =
-        tileData[0].tilePrice *
-          selectProductOrderDetail[0].quantity;
+          tileData[0].tilePrice * selectProductOrderDetail[0].quantity;
         totalPrice += totalTilePrice;
         console.log('Tile Price ' + totalTilePrice);
       }
@@ -211,34 +216,54 @@ export class ProductOrderService {
     await this.sellerOrderRepository.save(sellerOrder);
   }
 
-  async getSellerOrderList(selleruuid){
+  async getSellerOrderList(selleruuid) {
     const sellerOrderList = this.sellerOrderRepository.find({
-      where:{
-        sellerUuid:selleruuid,
-        sellerOrderStatus:0
-      }
-    })
-    return sellerOrderList
-
+      where: {
+        sellerUuid: selleruuid,
+        sellerOrderStatus: 0,
+      },
+    });
+    return sellerOrderList;
   }
 
-  async confirmSellerOrder(sellerOrder:SellerOrder){
-    const data = await this.sellerOrderRepository.findOne({
-      where:{
-        orderId:sellerOrder.orderId
-      }
-    })
-    data.finishDate = new Date(Date.now());
-    data.sellerOrderStatus = 1
-    
-    const orderData = await this.orderRepository.findOne({
-      where:{
-        orderId:sellerOrder.orderId
-      }
-    })
-    orderData.orderStatus = 3
+  async signatureUpload(@UploadedFile() file, sellerOrder: SellerOrder) {
+    const response = {
+      originalname: file.originalname,
+      filename: file.filename,
+    };
+    const sellerOrderData = await this.sellerOrderRepository.findOne({
+      where: {
+        orderId: sellerOrder.orderId,
+      },
+    });
+    sellerOrderData.sellerOrderSignatureImage = response.filename;
+    console.log(sellerOrderData);
+    await this.sellerOrderRepository.save(sellerOrderData);
+    await this.confirmSellerOrder(sellerOrder);
+    return response;
+  }
 
-    await this.sellerOrderRepository.save(data)
-    await this.orderRepository.save(orderData)
+  async getSignature(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: './signature' });
+  }
+
+  async confirmSellerOrder(sellerOrder: SellerOrder) {
+    const data = await this.sellerOrderRepository.findOne({
+      where: {
+        orderId: sellerOrder.orderId,
+      },
+    });
+    data.finishDate = new Date(Date.now());
+    data.sellerOrderStatus = 1;
+
+    const orderData = await this.orderRepository.findOne({
+      where: {
+        orderId: sellerOrder.orderId,
+      },
+    });
+    orderData.orderStatus = 3;
+
+    await this.sellerOrderRepository.save(data);
+    await this.orderRepository.save(orderData);
   }
 }

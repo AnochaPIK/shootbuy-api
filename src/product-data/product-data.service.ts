@@ -72,6 +72,7 @@ export class ProductDataService {
         tileId: label,
       },
     });
+    
     return query;
   }
 

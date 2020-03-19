@@ -6,12 +6,16 @@ import {
   Param,
   Res,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductOrderService } from './product-order.service';
 import { Order } from './models/order/order.entity';
 import { OrderDetail } from './models/order-detail/order-detail.entity';
 import { SellerOrder } from './models/seller-order/seller-order.entity';
-
+import { diskStorage } from 'multer';
+import { editFileName, imageFileFilter } from 'src/utils/file-uploading.utils';
 @Controller('product-order')
 export class ProductOrderController {
   constructor(private productOrderService: ProductOrderService) {}
@@ -64,9 +68,23 @@ export class ProductOrderController {
   getSellerOrderList(@Param() params) {
     return this.productOrderService.getSellerOrderList(params.sellerUuid);
   }
-  
-  @Post('confirmSellerOrder')
-  confirmSellerOrder(@Body() sellerOrder:SellerOrder) {
-    return this.productOrderService.confirmSellerOrder(sellerOrder);
+
+  @Post('signatureUpload')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './signature',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  signatureUpload(@UploadedFile() file, @Body() sellerOrder: SellerOrder) {
+    return this.productOrderService.signatureUpload(file, sellerOrder);
+  }
+
+  @Get('getSignature/:imgpath')
+  getSignature(@Param() params, @Res() res) {
+    return this.productOrderService.getSignature(params.imgpath, res);
   }
 }
