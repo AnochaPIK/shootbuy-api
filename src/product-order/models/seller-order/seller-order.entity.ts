@@ -33,6 +33,9 @@ export class SellerOrder {
   @Column({ default: 0 })
   sellerOrderStatus: number;
 
+  @Column({ type: 'text' })
+  sellerOrderSignatureImage: string;
+
   @Index()
   @ManyToOne(type => Seller)
   @JoinColumn({ name: 'sellerUuid', referencedColumnName: 'sellerUuid' })

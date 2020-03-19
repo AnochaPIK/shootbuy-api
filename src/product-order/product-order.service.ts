@@ -210,4 +210,35 @@ export class ProductOrderService {
     sellerOrder.assignDate = new Date(Date.now());
     await this.sellerOrderRepository.save(sellerOrder);
   }
+
+  async getSellerOrderList(selleruuid){
+    const sellerOrderList = this.sellerOrderRepository.find({
+      where:{
+        sellerUuid:selleruuid,
+        sellerOrderStatus:0
+      }
+    })
+    return sellerOrderList
+
+  }
+
+  async confirmSellerOrder(sellerOrder:SellerOrder){
+    const data = await this.sellerOrderRepository.findOne({
+      where:{
+        orderId:sellerOrder.orderId
+      }
+    })
+    data.finishDate = new Date(Date.now());
+    data.sellerOrderStatus = 1
+    
+    const orderData = await this.orderRepository.findOne({
+      where:{
+        orderId:sellerOrder.orderId
+      }
+    })
+    orderData.orderStatus = 3
+
+    await this.sellerOrderRepository.save(data)
+    await this.orderRepository.save(orderData)
+  }
 }

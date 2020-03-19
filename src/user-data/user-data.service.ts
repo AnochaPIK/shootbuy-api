@@ -49,6 +49,14 @@ export class UserDataService {
     return query;
   }
 
+  async getSellerList(sellerUuid): Promise<any[]> {
+    const query = await this.sellerRepository
+      .createQueryBuilder('seller')
+      .where('seller.sellerUuid != :sellerUuid',{sellerUuid:sellerUuid})
+      .getMany();
+    return query;
+  }
+
   async ifUserExist(user: User) {
     var userData = await this.userRepository.find({
       where: {

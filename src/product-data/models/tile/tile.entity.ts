@@ -39,6 +39,6 @@ export class Tile {
   @Column({ type: 'double' })
   tilePrice: number;
 
-  @Column({ type: 'text'})
+  @Column({ type: 'text' })
   tileImage: string;
 }
