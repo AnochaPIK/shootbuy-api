@@ -30,7 +30,7 @@ export class Tile {
   @Column({ type: 'double' })
   tileSquareMeterPerCtn: number;
 
-  @Column({})
+  @Column({ type: 'double' })
   tileSquareFTPerCtn: number;
 
   @Column({ type: 'double' })
@@ -39,6 +39,6 @@ export class Tile {
   @Column({ type: 'double' })
   tilePrice: number;
 
-  @Column()
+  @Column({ type: 'text'})
   tileImage: string;
 }
