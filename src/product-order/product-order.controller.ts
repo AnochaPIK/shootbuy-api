@@ -82,9 +82,19 @@ export class ProductOrderController {
   signatureUpload(@UploadedFile() file, @Body() sellerOrder: SellerOrder) {
     return this.productOrderService.signatureUpload(file, sellerOrder);
   }
+  // signatureUpload(@UploadedFile() file) {
+  //   return this.productOrderService.signatureUpload(file);
+  // }
+  
 
   @Get('getSignature/:imgpath')
   getSignature(@Param() params, @Res() res) {
     return this.productOrderService.getSignature(params.imgpath, res);
   }
+
+  @Post('confirmSellerOrder')
+  confirmSellerOrder(@Body() sellerOrder: SellerOrder) {
+    return this.productOrderService.confirmSellerOrder(sellerOrder);
+  }
+  
 }

@@ -233,8 +233,8 @@ export class ProductOrderService {
     });
     return sellerOrderList;
   }
-
   async signatureUpload(@UploadedFile() file, sellerOrder: SellerOrder) {
+    console.log(file)
     const response = {
       originalname: file.originalname,
       filename: file.filename,
@@ -250,6 +250,22 @@ export class ProductOrderService {
     await this.confirmSellerOrder(sellerOrder);
     return response;
   }
+  // async signatureUpload(@UploadedFile() file, sellerOrder: SellerOrder) {
+  //   const response = {
+  //     originalname: file.originalname,
+  //     filename: file.filename,
+  //   };
+  //   const sellerOrderData = await this.sellerOrderRepository.findOne({
+  //     where: {
+  //       orderId: sellerOrder.orderId,
+  //     },
+  //   });
+  //   sellerOrderData.sellerOrderSignatureImage = response.filename;
+  //   console.log(sellerOrderData);
+  //   await this.sellerOrderRepository.save(sellerOrderData);
+  //   await this.confirmSellerOrder(sellerOrder);
+  //   return response;
+  // }
 
   async getSignature(@Param('imgpath') image, @Res() res) {
     return res.sendFile(image, { root: './signature' });
