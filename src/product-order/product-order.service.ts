@@ -15,6 +15,7 @@ import { Electronic } from 'src/product-data/models/electronic/electronic.entity
 import { Furniture } from 'src/product-data/models/furniture/furniture.entity';
 import { SellerOrder } from './models/seller-order/seller-order.entity';
 import { Tile } from 'src/product-data/models/tile/tile.entity';
+import { Address } from 'src/user-data/models/address/address.entity';
 
 @Injectable()
 export class ProductOrderService {
@@ -217,17 +218,29 @@ export class ProductOrderService {
   }
 
   async getSellerOrderList(selleruuid) {
-    const sellerOrderList = this.sellerOrderRepository.find({
-      where: {
-        sellerUuid: selleruuid,
-        sellerOrderStatus: 0,
-      },
-    });
+    // const sellerOrderList = this.sellerOrderRepository.find({
+    //   where: {
+    //     sellerUuid: selleruuid,
+    //     sellerOrderStatus: 0,
+    //   },
+    // });
+    const sellerOrderList = this.sellerOrderRepository
+      .createQueryBuilder('sellerOrder')
+      .innerJoinAndSelect('sellerOrder.order', 'order')
+      .innerJoinAndMapOne(
+        "order.address",
+        Address,
+        'address',
+        'order.addressId = address.addressId',
+      )
+      .where('sellerOrder.sellerUuid = :selleruuid', { selleruuid: selleruuid })
+      .andWhere('sellerOrder.sellerOrderStatus = 0')
+      .getMany();
     return sellerOrderList;
   }
   async signatureUpload(@UploadedFile() file, sellerOrder: SellerOrder) {
-    console.log(file)
-    console.log(sellerOrder)
+    console.log(file);
+    console.log(sellerOrder);
     const response = {
       originalname: file.originalname,
       filename: file.filename,
