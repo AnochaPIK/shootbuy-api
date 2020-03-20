@@ -227,6 +227,7 @@ export class ProductOrderService {
   }
   async signatureUpload(@UploadedFile() file, sellerOrder: SellerOrder) {
     console.log(file)
+    console.log(sellerOrder)
     const response = {
       originalname: file.originalname,
       filename: file.filename,
@@ -237,25 +238,16 @@ export class ProductOrderService {
       },
     });
     sellerOrderData.sellerOrderSignatureImage = response.filename;
-    console.log(sellerOrderData);
     await this.sellerOrderRepository.save(sellerOrderData);
     await this.confirmSellerOrder(sellerOrder);
     return response;
   }
-  // async signatureUpload(@UploadedFile() file, sellerOrder: SellerOrder) {
+  // async signatureUpload(@UploadedFile() file) {
+  //   console.log(file)
   //   const response = {
   //     originalname: file.originalname,
   //     filename: file.filename,
   //   };
-  //   const sellerOrderData = await this.sellerOrderRepository.findOne({
-  //     where: {
-  //       orderId: sellerOrder.orderId,
-  //     },
-  //   });
-  //   sellerOrderData.sellerOrderSignatureImage = response.filename;
-  //   console.log(sellerOrderData);
-  //   await this.sellerOrderRepository.save(sellerOrderData);
-  //   await this.confirmSellerOrder(sellerOrder);
   //   return response;
   // }
 
