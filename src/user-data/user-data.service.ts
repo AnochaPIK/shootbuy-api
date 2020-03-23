@@ -45,6 +45,7 @@ export class UserDataService {
       .leftJoinAndSelect('order.orderDetail', 'orderDetail')
       .leftJoinAndSelect('orderDetail.product', 'product')
       .where('order.orderStatus != 0')
+      .orderBy('order.orderStatus', 'ASC')
       .getMany();
     return query;
   }
@@ -52,7 +53,7 @@ export class UserDataService {
   async getSellerList(sellerUuid): Promise<any[]> {
     const query = await this.sellerRepository
       .createQueryBuilder('seller')
-      .where('seller.sellerUuid != :sellerUuid',{sellerUuid:sellerUuid})
+      .where('seller.sellerUuid != :sellerUuid', { sellerUuid: sellerUuid })
       .getMany();
     return query;
   }
@@ -84,7 +85,7 @@ export class UserDataService {
   async ifAdminExist(uuid): Promise<any[]> {
     var adminData = await this.adminRepository.find({
       where: {
-        adminUuid: uuid
+        adminUuid: uuid,
       },
     });
     return adminData;
@@ -110,15 +111,16 @@ export class UserDataService {
       .innerJoinAndSelect('scanHistory.product', 'product')
       .innerJoinAndSelect('product.category', 'category')
       .where('user.uuid = :uuid', { uuid: uuid })
-      .getMany();
-    // selectProductOrder[0].orderDateTime = moment(selectProductOrder[0].orderDateTime).format('DD-MM-YYYY')
+      .orderBy('scanHistory.scanDateTime', 'ASC')
 
-    selectData[0].scanHistory.forEach(
-      ScanHistory =>
-        (ScanHistory.scanDateTime = moment(ScanHistory.scanDateTime).format(
-          'DD/MM/YYYY',
-        )),
-    );
+      .getMany();
+
+    // selectData[0].scanHistory.forEach(
+    //   ScanHistory =>
+    //     (ScanHistory.scanDateTime = moment(ScanHistory.scanDateTime).format(
+    //       'DD/MM/YYYY',
+    //     )),
+    // );
     return selectData;
   }
 

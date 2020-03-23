@@ -41,7 +41,7 @@ export class SellerOrder {
   @JoinColumn({ name: 'sellerUuid', referencedColumnName: 'sellerUuid' })
   seller: Seller;
 
-  // @Index()
+  @Index()
   @OneToOne(type => Order)
   @JoinColumn({ name: 'orderId', referencedColumnName: 'orderId' })
   order: Order;

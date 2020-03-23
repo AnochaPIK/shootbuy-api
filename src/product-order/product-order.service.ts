@@ -76,6 +76,7 @@ export class ProductOrderService {
       .innerJoinAndSelect('orderDetail.product', 'product')
       .where('order.uuid = :uuid', { uuid: uuid })
       .andWhere('order.orderStatus != 0')
+      .orderBy('order.orderDateTime', 'ASC')
       .getMany();
     return selectProductOrder;
   }
@@ -213,16 +214,17 @@ export class ProductOrderService {
   }
 
   async assignSellerOrder(sellerOrder: SellerOrder) {
+    console.log(sellerOrder)
     sellerOrder.assignDate = new Date(Date.now());
     await this.sellerOrderRepository.save(sellerOrder);
 
     var data = await this.orderRepository.findOne({
-      where:{
-        orderId:sellerOrder.orderId
-      }
-    })
-    data.orderStatus = 2
-    await this.orderRepository.save(data)
+      where: {
+        orderId: sellerOrder.orderId,
+      },
+    });
+    data.orderStatus = 2;
+    await this.orderRepository.save(data);
   }
 
   async getSellerOrderList(selleruuid) {
@@ -236,7 +238,7 @@ export class ProductOrderService {
       .createQueryBuilder('sellerOrder')
       .innerJoinAndSelect('sellerOrder.order', 'order')
       .innerJoinAndMapOne(
-        "order.address",
+        'order.address',
         Address,
         'address',
         'order.addressId = address.addressId',
