@@ -76,7 +76,7 @@ export class ProductOrderService {
       .innerJoinAndSelect('orderDetail.product', 'product')
       .where('order.uuid = :uuid', { uuid: uuid })
       .andWhere('order.orderStatus != 0')
-      .orderBy('order.orderDateTime', 'ASC')
+      .orderBy('order.orderDateTime', 'DESC')
       .getMany();
     return selectProductOrder;
   }
@@ -245,6 +245,7 @@ export class ProductOrderService {
       )
       .where('sellerOrder.sellerUuid = :selleruuid', { selleruuid: selleruuid })
       .andWhere('sellerOrder.sellerOrderStatus = 0')
+      .orderBy('sellerOrder.assignDate','ASC')
       .getMany();
     return sellerOrderList;
   }

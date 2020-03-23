@@ -111,7 +111,7 @@ export class UserDataService {
       .innerJoinAndSelect('scanHistory.product', 'product')
       .innerJoinAndSelect('product.category', 'category')
       .where('user.uuid = :uuid', { uuid: uuid })
-      .orderBy('scanHistory.scanDateTime', 'ASC')
+      .orderBy('scanHistory.scanDateTime', 'DESC')
 
       .getMany();
 
