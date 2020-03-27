@@ -86,8 +86,8 @@ export class ProductOrderService {
       .createQueryBuilder('order')
       // .select("DATE_FORMAT(order.orderDateTime,'%d/%m%Y') as orderDateTime")
       // .select("order.orderDateTime")
-      .innerJoinAndSelect('order.orderDetail', 'orderDetail')
-      .innerJoinAndSelect('orderDetail.product', 'product')
+      .leftJoinAndSelect('order.orderDetail', 'orderDetail')
+      .leftJoinAndSelect('orderDetail.product', 'product')
       .where('order.orderId = :orderId', { orderId: orderId })
       .getMany();
     selectProductOrder[0].orderDateTime = moment(
@@ -108,6 +108,34 @@ export class ProductOrderService {
     orderDetail.quantity = orderDetailData[0].quantity - 1;
     await this.orderDetailRepository.save(orderDetail);
     this.updateProductOrderPrice(orderDetail.orderId);
+  }
+
+  async removeOrderDetailProductId(orderDetail: OrderDetail) {
+    console.log(orderDetail);
+    const orderDetailData = await this.orderDetailRepository
+      .createQueryBuilder('orderDetail')
+      .delete()
+      .where('order_detail.productId = :productId', {
+        productId: orderDetail.productId,
+      })
+      .andWhere('order_detail.orderId = :orderId', {
+        orderId: orderDetail.orderId,
+      })
+      .execute();
+    const orderData = await this.getProductOrderByOrderId(orderDetail.orderId);
+    if (orderData[0].orderDetail.length == 0) {
+      await this.removeOrder(orderDetail);
+    } else await this.updateProductOrderPrice(orderDetail.orderId);
+  }
+
+  async removeOrder(orderDetail: OrderDetail) {
+    const orderDetailData = await this.orderRepository
+      .createQueryBuilder('order')
+      .delete()
+      .where('order.orderId = :orderId', {
+        orderId: orderDetail.orderId,
+      })
+      .execute();
   }
 
   async updateProductOrderPrice(orderId) {
@@ -214,7 +242,7 @@ export class ProductOrderService {
   }
 
   async assignSellerOrder(sellerOrder: SellerOrder) {
-    console.log(sellerOrder)
+    console.log(sellerOrder);
     sellerOrder.assignDate = new Date(Date.now());
     await this.sellerOrderRepository.save(sellerOrder);
 
@@ -245,7 +273,7 @@ export class ProductOrderService {
       )
       .where('sellerOrder.sellerUuid = :selleruuid', { selleruuid: selleruuid })
       .andWhere('sellerOrder.sellerOrderStatus = 0')
-      .orderBy('sellerOrder.assignDate','ASC')
+      .orderBy('sellerOrder.assignDate', 'ASC')
       .getMany();
     return sellerOrderList;
   }

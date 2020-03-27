@@ -99,4 +99,14 @@ export class ProductOrderController {
     return this.productOrderService.confirmSellerOrder(sellerOrder);
   }
   
+  @Post('removeOrderDetailProductId')
+  removeOrderDetailProductId(@Body() orderDetail: OrderDetail) {
+    return this.productOrderService.removeOrderDetailProductId(orderDetail);
+  }
+  
+  @Post('removeOrder')
+  removeOrder(@Body() orderDetail: OrderDetail) {
+    return this.productOrderService.removeOrder(orderDetail);
+  }
+  
 }
