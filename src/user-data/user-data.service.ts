@@ -46,6 +46,7 @@ export class UserDataService {
       .leftJoinAndSelect('orderDetail.product', 'product')
       .where('order.orderStatus != 0')
       .orderBy('order.orderStatus', 'ASC')
+      .addOrderBy('order.orderId','DESC')
       .getMany();
     return query;
   }
