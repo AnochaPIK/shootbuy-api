@@ -8,4 +8,7 @@ export class Category {
     @Column({ length: "50" }) 
     categoryName: string; 
 
+    @OneToMany(type => Product, product => product.category)
+    product: Product[];
+
 }
